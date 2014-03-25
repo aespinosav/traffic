@@ -60,7 +60,7 @@ def so_sol(adj, edge_list, a, b, d):
     
 def ue_sol(adj, edge_list, a, b, d):
     """
-    Solves the system optimal traffic assignment problem for 1 O-D pair.
+    Solves the user equilibrium traffic assignment problem for 1 O-D pair.
     for linear cost functions of the type f = a + bx.
     
     adj - adjacency matrix of traffic network
