@@ -23,10 +23,12 @@ def so_sol(adj, edge_list, a, b, d):
     H = np.diagflat(2*b)
     f = a
     
-    A = -np.eye(len(edge_list))
+    #A = -np.eye(len(edge_list))
     bb = np.zeros(len(edge_list))
     
-    Aeq = np.zeros(nodes*edges).reshape(nodes,edges)
+    lb = np.zeros(edges)
+    
+    Aeq = np.zeros(nodes*edges).reshape(edges, nodes)
     beq = np.zeros(nodes)
     
     beq[0] = -d  # it is assumed that origin node only has outgoing edges
@@ -49,9 +51,9 @@ def so_sol(adj, edge_list, a, b, d):
             Aeq[n,i] = -1
     
     
-    op.QP()
+    #op.QP()
     
-    p = op.QP(H = H, f = f, A = A, b = bb, Aeq = Aeq, beq = beq)
+    p = op.QP(H = H, f = f, lb = lb, b = bb, Aeq = Aeq, beq = beq)
     r = p._solve('cvxopt_qp', iprint = 0)
     f_opt, x_opt = r.ff, r.xf
     
@@ -79,8 +81,9 @@ def ue_sol(adj, edge_list, a, b, d):
     H = np.diagflat(b)
     f = a
     
-    A = -np.eye(len(edge_list))
+    #A = -np.eye(len(edge_list))
     bb = np.zeros(len(edge_list))
+    lb = np.zeros(edges)
     
     Aeq = np.zeros(nodes*edges).reshape(nodes,edges)
     beq = np.zeros(nodes)
@@ -105,9 +108,9 @@ def ue_sol(adj, edge_list, a, b, d):
             Aeq[n,i] = -1
     
     
-    op.QP()
+    #op.QP()
     
-    p = op.QP(H = H, f = f, A = A, b = bb, Aeq = Aeq, beq = beq)
+    p = op.QP(H = H, f = f, lb = lb, b = bb, Aeq = Aeq, beq = beq)
     r = p._solve('cvxopt_qp', iprint = 0)
     f_opt, x_opt = r.ff, r.xf
     
