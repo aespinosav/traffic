@@ -10,7 +10,7 @@ def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
     Solves for either UE or SO passed as a string as the regime argument
 
     adj - adjacency matrix of traffic network
-    edge_list - ordered edge list
+    edge_list - ordered edge list (edges represented by tuples of nodes eg. (0,1) )
     a - array of "a" parameters of link cost functions (order according to edge_list)
     b - array of "b" parameters of link cost functions (order according to edge_list)
     
