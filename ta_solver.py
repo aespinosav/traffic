@@ -114,7 +114,7 @@ def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO"):
         x = ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime)
         sols.append(x)
         
-    return sols
+    return np.array(sols)
         
     
     
