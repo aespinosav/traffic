@@ -1,4 +1,5 @@
 from cvxopt import matrix, solvers
+import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
@@ -115,6 +116,22 @@ def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO"):
         sols.append(x)
         
     return np.array(sols)
+    
+def plot_flows(D, sols, legend=False):
+    """
+    Plots the flows obtained from ta_range_solve when given the demand range and the flow solutions
+    """
+    
+    for i in range(len(sols[0])):
+        plt.plot(D, sols[:,i], label="Flow {}".format(i+1))
+    
+    if legend:
+        plt.legend(loc=4)
+        
+    plt.xlabel('Demand')
+    plt.ylabel('Flow')
+        
+    plt.show()
         
     
     
