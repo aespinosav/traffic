@@ -2,6 +2,7 @@ from cvxopt import matrix, solvers
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
+import networkx as nx
 
 def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
     """
@@ -166,6 +167,49 @@ def total_cost_func(X, a, b):
     costs = np.array(costs)
     
     return costs
+    
+
+def ta_solve_network(g, demand, regime):
+    """Solves the traffic assignment problem for a network.
+    
+    g - networkx network object
+    demand - a demand range for which to solve the ta problem
+    """
+    
+    adj = np.array(nx.adjacency_matrix(g))
+    edge_list = g.edges()
+    
+    a_coefs = [g[e[0]][e[1]]['a'] for e in g.edges_iter()]
+    b_coefs = [g[e[0]][e[1]]['b'] for e in g.edges_iter()]
+    
+    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime)
+    
+    return sols
+    
+    
+def plot_graph_for_flows(g, OD=None):
+    
+    pos = nx.spring_layout(g)
+    
+    #Make dictionary for edge labels
+    edge_labels = []
+    for i in range(len(g.edges())):
+        u, v = g.edges()[i]
+        edge_labels.append(((u,v,),i+1))
+    edge_labels = dict(edge_labels)
+    
+    if OD is None:
+        origin = g.nodes()[0]
+        destination = g.nodes()[-1]
+    else:
+        origin, destination = OD
+        
+    node_label_dict = {origin:'O', destination:'D'}
+    
+    nx.draw_networkx(g, pos, labels=node_label_dict)
+    nx.draw_networkx_edge_labels(g,pos,edge_labels=edge_labels, font_size=14)
+    plt.axis('equal')
+    plt.axis('off')
     
     
     
