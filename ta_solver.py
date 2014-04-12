@@ -118,23 +118,6 @@ def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO"):
         
     return np.array(sols)
     
-def plot_flows(D, sols, legend=False):
-    """
-    Plots the flows obtained from ta_range_solve when given the demand range and the flow solutions
-    """
-    
-    for i in range(len(sols[0])):
-        plt.plot(D, sols[:,i], label="Flow {}".format(i+1))
-    
-    if legend:
-        plt.legend(loc=4)
-        
-    plt.xlabel('Demand')
-    plt.ylabel('Flow')
-        
-    plt.show()
-        
-    
     
 def total_cost(x, a, b):
     """
@@ -210,8 +193,25 @@ def plot_graph_for_flows(g, OD=None):
     nx.draw_networkx_edge_labels(g,pos,edge_labels=edge_labels, font_size=14)
     plt.axis('equal')
     plt.axis('off')
+
     
+def plot_flows(D, sols, legend=False):
+    """
+    Plots the flows obtained from ta_range_solve when given the demand range and the flow solutions
+    """
     
+    for i in range(len(sols[0])):
+        plt.plot(D, sols[:,i], label="Flow {}".format(i+1))
+    
+    if legend:
+        plt.legend(loc=4)
+        
+    plt.xlabel('Demand')
+    plt.ylabel('Flow')
+    
+    #todo: plot the graph here as well (possibly in upper left corner) / maybe if graph is smaller than N nodes
+        
+    plt.show()
     
     
 
