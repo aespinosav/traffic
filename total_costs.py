@@ -1,8 +1,23 @@
-from __future__ import division
+#from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
 
+#def F_SO(d, a, b, am, bm):
+    
+    #d_on = (1- am - a)/(2*(1+bm))
+    #d_off = (1- am - a)/(1-b)
+    
+    #if d < d_on:
+        #cost = (2+bm)*d**2 + (2*a+am)*d
+    #elif d < d_off:
+        #cost = 0.5*(1+b-(((1-b)**2)/(1+2*bm+b)))*d**2 + (1+a -((1-b)*(1- am - a))/(1+2*bm+b))*d - ((1-am-a)**2)/(1+2*bm+b)
+    #else:
+        #cost = ((1+b)/(2))*d**2 + (a+1)*d
+        
+    #return cost
+    
+    
 def F_SO(d, a, b, am, bm):
     
     d_on = (1- am - a)/(2*(1+bm))
@@ -10,12 +25,17 @@ def F_SO(d, a, b, am, bm):
     
     if d < d_on:
         cost = (2+bm)*d**2 + (2*a+am)*d
-    elif d < d_off:
-        cost = 0.5*(1+b-(((1-b)**2)/(1+2*bm+b)))*d**2 + (1+a -((1-b)*(1- am - a))/(1+2*bm+b))*d - ((1-am-a)**2)/(1+2*bm+b)
+
+    if d < d_off:
+        cost = 0.5*(1 + b - ((1-b)**2)/(1+2*bm +b))*d**2 \
+            + (1 + a - (1 - am - a)*(1-b)/(1+2*bm +b))*d \
+            - 0.5*((1 - am - a)**2)/(1+2*bm +b)
+    
     else:
-        cost = ((1+b)/(2))*d**2 + (a+1)*d
-        
+         cost = ((1+b)/(2))*d**2 + (a+1)*d
+         
     return cost
+    
     
 #def F_SO_alt(d, a, b, am, bm):
     
@@ -34,18 +54,18 @@ def F_SO(d, a, b, am, bm):
     
     #return min(c)
     
-def F_SO_A(d, a, b, am, bm):
+#def F_SO_A(d, a, b, am, bm):
     
-    cost = (2+bm)*d**2 + (2*a+am)*d
-    return cost
+    #cost = (2+bm)*d**2 + (2*a+am)*d
+    #return cost
     
-def F_SO_B(d, a, b, am, bm):
-    cost = 0.5*(1+b-((1-b)**2/(1+2*bm+b)))*d**2 + (1+a -((1-b)*(1- am - a))/(1+2*bm+b))*d - (1-am-a)**2/(1+2*bm+b)
-    return cost
+#def F_SO_B(d, a, b, am, bm):
+    #cost = 0.5*(1+b-((1-b)**2/(1+2*bm+b)))*d**2 + (1+a -((1-b)*(1- am - a))/(1+2*bm+b))*d - (1-am-a)**2/(1+2*bm+b)
+    #return cost
     
-def F_SO_C(d, a, b, am, bm):
-    cost = ((1+b)/(2))*d**2 + (a+1)*d
-    return cost
+#def F_SO_C(d, a, b, am, bm):
+    #cost = ((1+b)/(2))*d**2 + (a+1)*d
+    #return cost
     
 
     
@@ -65,12 +85,12 @@ def F_UE(d, a, b, am, bm):
 
     
     
-a = 0.5 
-b = 0.5
-am= 0.1
-bm= 0.1
+#a = 0.5 
+#b = 0.5
+#am= 0.1
+#bm= 0.1
 
-D = np.arange(0, 1.5*2*(1- am - a)/(1-b) + 0.001, 0.001)
+#D = np.arange(0, 1.5*2*(1- am - a)/(1-b) + 0.001, 0.001)
 
 #ca = []
 #cb = []
@@ -93,7 +113,7 @@ D = np.arange(0, 1.5*2*(1- am - a)/(1-b) + 0.001, 0.001)
 
 
 
-
+D = np.arange(0, 3, 0.01)
 
 SO_cost =[]
 #SO_cost_alt =[]

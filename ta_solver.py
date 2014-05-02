@@ -213,7 +213,6 @@ def plot_flows(D, sols, legend=False):
         
     plt.show()
     
-    
 
 ##Testing values (this should be commented out when using as a library)
 #aa = 0.5
