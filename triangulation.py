@@ -9,8 +9,10 @@ Functions and/or objects to create a network using delaunay triangulation.
 The objective is to generate a random connected directed planar graph.
 """
 
-number_of_points = 30
-min_allowed_dist = 0.025
+
+number_of_points = 1000
+param = 0.95
+#min_allowed_dist = 0.025
 pts = [np.random.random(2) for i in range(number_of_points)]
 
 #removed = True
@@ -75,10 +77,50 @@ g.add_nodes_from(point_list)
 g.add_weighted_edges_from(edge_list, weight='a')
 
 a_list = edge_lengths
-b_list = [np.random.random() for i in range(len(g.edges()))]
+b_list = [np.random.random() for i in range(len(g.edges()))] #uniform at the moment but can be different
 
 for i in range(len(edge_list)):
         g.edge[edge_list[i][0]][edge_list[i][1]]['b'] = b_list[i]
+
+
+norms = [np.linalg.norm(g.node[i]['pos']) for i in g.node]
+
+origin = np.argmin(norms)
+destination = np.argmax(norms)
+
+#Remove edges from graph
+
+g_removing = g.copy()
+
+total_edges = len(g.edges())
+to_remove = int(total_edges*param)
+
+
+eds = list(g.edges(data=True))
+
+while to_remove > 0:
+    
+    if len(eds) != 0:    
+        
+        np.random.shuffle(eds)
+        
+        e = eds.pop()
+        
+        g_removing.remove_edge(*e[:2])
+        
+        if nx.has_path(g_removing, origin, destination):
+            to_remove -= 1
+        else:
+            
+            g_removing.add_edge(*e)
+        
+    else:
+        print "cannot remove more edges and have O-D connected"
+        break
+    
+#extract subgraph from connected component of OD pair
+connected_nodes =  nx.node_connected_component(g_removing, origin)
+g_pruned = nx.subgraph(g_removing, connected_nodes)
 
 
 
@@ -96,10 +138,9 @@ for i in range(len(edge_list)):
 
 
 
-def plot_net(g, draw='all', edge_colour='k'):
+def plot_net(g, draw='all', edge_colour='k', width=1.0):
     
     #point_dict = 
-    
     if draw == 'all':
         nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5 )
         nx.draw_networkx_edges(g, point_dict, edge_color=edge_colour, )
@@ -116,19 +157,25 @@ def plot_net(g, draw='all', edge_colour='k'):
         plt.axis('equal')
         
     elif draw == 'edges':
-        nx.draw_networkx_edges(g, point_dict, edge_color=edge_colour)
+        nx.draw_networkx_edges(g, point_dict, edge_color=edge_colour, width=width)
         
         fig = plt.gcf()
         plt.axis('equal')
         plt.axis('off')
         
+    nx.draw_networkx_nodes(g, point_dict, nodelist=[origin], node_color='g', node_size=30)
+    nx.draw_networkx_nodes(g, point_dict, nodelist=[destination], node_color='b', node_size=30)
+        
     plt.show()
         
 
 g_mst = nx.mst.minimum_spanning_tree(g, weight='a')
-        
-plot_net(g)
-plot_net(g_mst, 'edges', 'cyan')
+
+plot_net(g, "edges")
+plot_net(g_mst, 'edges', 'cyan', width=2.5)
+plot_net(g_pruned, 'edges', 'magenta')
+
+
 #plt.show()
 #def rand_triangulation(number_of_points):
     #"""
