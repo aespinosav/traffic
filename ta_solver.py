@@ -4,7 +4,7 @@ import numpy as np
 import sympy as sp
 import networkx as nx
 
-def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
+def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO", origin_index=0, destination_index=-1):
     """
     Solves the traffic assignment problem for 1 O-D pair.
     for linear cost functions of the type f = a + bx.
@@ -18,8 +18,11 @@ def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
     
     d - demand on the network
     
-    node 0 should be the origin
+    By default node 0 should be the origin
     the last node should be the destination
+    
+    The index of the origin and destination nodes can otherwise be 
+    specified in the respective arguments
     """
     
     nodes = len(adj)
@@ -72,8 +75,8 @@ def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
                 A[i, k] = -1.0  
     
     b = np.zeros(nodes)
-    b[0] = -d
-    b[-1] = d
+    b[origin_index] = -d
+    b[destination_index] = d
     
     augmented_matrix = np.column_stack([A, b])    
     
@@ -106,14 +109,14 @@ def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO"):
     
     return x
     
-def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO"):
+def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO", origin_index=0, destination_index=-1):
     """
     Solves the traffic assignment for a range of demand using ta_solve.
     """
     
     sols = []
     for d in D:
-        x = ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime)
+        x = ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime, origin_index, destination_index)
         sols.append(x)
         
     return np.array(sols)
@@ -165,7 +168,13 @@ def ta_solve_network(g, demand, regime):
     a_coefs = [g[e[0]][e[1]]['a'] for e in g.edges_iter()]
     b_coefs = [g[e[0]][e[1]]['b'] for e in g.edges_iter()]
     
-    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime)
+    for i in range(len(g.nodes())):
+        if g.node[i].has_key('origin'):
+            origin_index = i
+        if g.node[i].has_key('destination'):
+            destination_index = i
+    
+    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index)
     
     return sols
     

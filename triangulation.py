@@ -10,8 +10,8 @@ The objective is to generate a random connected directed planar graph.
 """
 
 
-number_of_points = 1000
-param = 0.95
+number_of_points = 50
+param = 0.5
 #min_allowed_dist = 0.025
 pts = [np.random.random(2) for i in range(number_of_points)]
 
@@ -88,6 +88,9 @@ norms = [np.linalg.norm(g.node[i]['pos']) for i in g.node]
 origin = np.argmin(norms)
 destination = np.argmax(norms)
 
+g.node[origin]['origin']=True
+g.node[destination]['destination']=True
+
 #Remove edges from graph
 
 g_removing = g.copy()
@@ -121,6 +124,12 @@ while to_remove > 0:
 #extract subgraph from connected component of OD pair
 connected_nodes =  nx.node_connected_component(g_removing, origin)
 g_pruned = nx.subgraph(g_removing, connected_nodes)
+
+
+#Now we rename the nodes to avoid having skipped numbers
+g_pruned = nx.convert_node_labels_to_integers(g_pruned,first_label=0)
+g_pruned = g_pruned.to_directed()
+
 
 
 
