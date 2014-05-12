@@ -1,3 +1,5 @@
+import sys
+import os
 from cvxopt import matrix, solvers
 import matplotlib.pyplot as plt
 import numpy as np
@@ -109,16 +111,27 @@ def ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime="SO", origin_index=0, d
     
     return x
     
-def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO", origin_index=0, destination_index=-1):
+def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO", origin_index=0, destination_index=-1,  fname="solver_out.txt"):
     """
     Solves the traffic assignment for a range of demand using ta_solve.
     """
+    
+    # We want to redirect the printed output of the solver to 
+    # a file so that it does not clog the terminal or notebook or whatever
+    os.system('rm {}'.format(fname));
+    orig_stdout = sys.stdout
+    f = file('{}'.format(fname), 'a')
+    sys.stdout = f
     
     sols = []
     for d in D:
         x = ta_solve(adj, edge_list, a_coefs, b_coefs, d, regime, origin_index, destination_index)
         sols.append(x)
         
+     #after the solver sends its output to file we want to restablish stdout
+    sys.stdout = orig_stdout
+    f.close()
+    
     return np.array(sols)
     
     
@@ -155,7 +168,7 @@ def total_cost_func(X, a, b):
     return costs
     
 
-def ta_solve_network(g, demand, regime):
+def ta_solve_network(g, demand, regime, fname="solver_out.txt"):
     """Solves the traffic assignment problem for a network.
     
     g - networkx network object
@@ -174,7 +187,7 @@ def ta_solve_network(g, demand, regime):
         if g.node[i].has_key('destination'):
             destination_index = i
     
-    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index)
+    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index, fname=fname)
     
     return sols
     
