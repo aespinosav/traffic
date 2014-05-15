@@ -167,6 +167,15 @@ def total_cost_func(X, a, b):
     
     return costs
     
+def total_network_cost(g, flows):
+    
+    a = [g.edges(data=True)[i][-1]['a'] for i in range(g.number_of_edges())]
+    b = [g.edges(data=True)[i][-1]['b'] for i in range(g.number_of_edges())]
+    
+    return total_cost_func(flows, a, b)
+    
+    
+    
 
 def ta_solve_network(g, demand, regime, fname="solver_out.txt"):
     """Solves the traffic assignment problem for a network.

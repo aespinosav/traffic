@@ -316,7 +316,12 @@ def plot_net(g, draw='all', edge_colour='k', width=1.0):
     plt.show()
     
     
-def plot_active_links_1step(g, sol, max_demand=10):
+def plot_active_links_1step(g, sol, colour='magenta'):
+    """
+    Plots the active link set of the graph.
+    
+    Active links in desired colour (default magenta), inactive links in light gray
+    """
     
     for i in range(len(g.nodes())):
         if g.node[i].has_key('origin') and g.node[i]['origin']:
@@ -345,7 +350,7 @@ def plot_active_links_1step(g, sol, max_demand=10):
     nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5)
     
     nx.draw_networkx_edges(g, point_dict, edgelist=inactive_edges, edge_color='0.5', edge_cmap = mpl.cm.binary, edge_vmin=0.0, edge_vmax=1.0)
-    nx.draw_networkx_edges(g, point_dict, edgelist=active_edges, edge_color='magenta')
+    nx.draw_networkx_edges(g, point_dict, edgelist=active_edges, edge_color=colour)
     
     nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5 )
     
@@ -357,9 +362,29 @@ def plot_active_links_1step(g, sol, max_demand=10):
     plt.axis('equal')
     
     plt.show()
+    
 
+def active_linkset_animation():
+    """
+    Returns an animation of the active linkset with demand
     
+    For this to work, the solution must also have been calculated and the demand range must be called D
+    (will try to fix this...)
+    """
     
+    fig = plt.figure()
+
+    graph = plot_active_links_1step(g, sols[0])
+
+    def animate(i):
+        global graph, D
+        graph = plot_active_links_1step(g, sols[i])
+        plt.title("demand = {}".format(D[i]))
+        return graph
+
+    ani = mpl.animation.FuncAnimation(fig, animate, frames=len(D))
+    
+    return ani
 
         
 def MST(g, w='a'):
