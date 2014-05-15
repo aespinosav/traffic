@@ -1,5 +1,6 @@
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import scipy as sp
 import numpy as np
 import networkx as nx
@@ -9,7 +10,7 @@ Functions and/or objects to create a network using delaunay triangulation.
 The objective is to generate a random connected directed planar graph.
 """
 
-def make_triangulation(points):
+def make_triangulation(points, b_max=1.0):
     """
     Makes a networkx graph from a delaunay triangulation in a unit square
     
@@ -56,7 +57,7 @@ def make_triangulation(points):
     g.add_weighted_edges_from(edge_list, weight='a')
 
     a_list = edge_lengths
-    b_list = [np.random.random() for i in range(len(g.edges()))] #uniform at the moment but can be different
+    b_list = [b_max*np.random.random() for i in range(len(g.edges()))] #uniform at the moment but can be different (uniform in the range 0-b_range)
 
     for i in range(len(edge_list)):
             g.edge[edge_list[i][0]][edge_list[i][1]]['b'] = b_list[i]
@@ -126,7 +127,12 @@ def prune_triangulation(g, param):
     
     return g_pruned
 
+
+def make_pruned_triangulation(nodes, param, b_max=1.0):
+    g = make_triangulation(nodes, b_max)
+    g = prune_triangulation(g, param)
     
+    return g
     
 #########################################################
 #########################################################
@@ -280,8 +286,8 @@ def plot_net(g, draw='all', edge_colour='k', width=1.0):
         if g.node[i].has_key('destination') and g.node[i]['destination']:
             destination = i
     
-    
     point_dict = {i:g.node[i]['pos'] for i in g.nodes()}
+    
     if draw == 'all':
         nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5 )
         nx.draw_networkx_edges(g, point_dict, edge_color=edge_colour, )
@@ -308,6 +314,53 @@ def plot_net(g, draw='all', edge_colour='k', width=1.0):
     nx.draw_networkx_nodes(g, point_dict, nodelist=[destination], node_color='b', node_size=30)
         
     plt.show()
+    
+    
+def plot_active_links_1step(g, sol, max_demand=10):
+    
+    for i in range(len(g.nodes())):
+        if g.node[i].has_key('origin') and g.node[i]['origin']:
+            origin = i
+        if g.node[i].has_key('destination') and g.node[i]['destination']:
+            destination = i
+    
+    point_dict = {i:g.node[i]['pos'] for i in g.nodes()}
+    
+    
+    status_list = []
+    tolerance = 1E-3 
+    for flow in sol:
+        if flow > tolerance: 
+            status = 'active'
+        else:
+            status = 'inactive'
+        
+        status_list.append(status)
+        
+    active_edges = [g.edges()[i] for i in range(len(status_list)) if status_list[i]=='active']
+    inactive_edges = [g.edges()[i] for i in range(len(status_list)) if status_list[i]=='inactive']
+    
+    plt.clf()
+    
+    nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5)
+    
+    nx.draw_networkx_edges(g, point_dict, edgelist=inactive_edges, edge_color='0.5', edge_cmap = mpl.cm.binary, edge_vmin=0.0, edge_vmax=1.0)
+    nx.draw_networkx_edges(g, point_dict, edgelist=active_edges, edge_color='magenta')
+    
+    nx.draw_networkx_nodes(g, point_dict, node_size=20, linewidths=0.5 )
+    
+    nx.draw_networkx_nodes(g, point_dict, nodelist=[origin], node_color='g', node_size=30)
+    nx.draw_networkx_nodes(g, point_dict, nodelist=[destination], node_color='b', node_size=30)
+    
+    fig = plt.gcf()
+    plt.axis('off')
+    plt.axis('equal')
+    
+    plt.show()
+
+    
+    
+
         
 def MST(g, w='a'):
     """
