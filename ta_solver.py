@@ -135,6 +135,67 @@ def ta_range_solve(D, adj, edge_list, a_coefs, b_coefs, regime="SO", origin_inde
     return np.array(sols)
     
     
+
+def ta_solve_network(g, demand, regime, fname="solver_out.txt"):
+    """Solves the traffic assignment problem for a network.
+    
+    g - networkx network object
+    demand - a demand range for which to solve the ta problem
+    """
+    
+    adj = np.array(nx.adjacency_matrix(g))
+    edge_list = g.edges()
+    
+    coefs = np.array([(g[e[0]][e[1]]['a'], g[e[0]][e[1]]['b'])  for e in g.edges()])
+    
+    a_coefs = list(coefs[:,0])
+    b_coefs = list(coefs[:,1])
+
+    for i in range(len(g.nodes())):
+        if g.node[i].has_key('origin'):
+            origin_index = i
+            origin_exists = True
+        if g.node[i].has_key('destination'):
+            destination_index = i
+            destination_exists = True
+            
+    # If no origin or destination exists, the first node in the network is taken to be origin and 
+    # the last node is taken to be the destination
+    if not origin_exists:
+        g.node[0]['origin']=True
+    if not destination_exists:
+        g.node[g.number_of_nodes() - 1]['destination']=True
+    
+    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index, fname=fname)
+    
+    return sols
+    
+    
+def plot_graph_for_flows(g, OD=None):
+    
+    pos = nx.spring_layout(g)
+    
+    #Make dictionary for edge labels
+    edge_labels = []
+    for i in range(len(g.edges())):
+        u, v = g.edges()[i]
+        edge_labels.append(((u,v,),i+1))
+    edge_labels = dict(edge_labels)
+    
+    if OD is None:
+        origin = g.nodes()[0]
+        destination = g.nodes()[-1]
+    else:
+        origin, destination = OD
+        
+    node_label_dict = {origin:'O', destination:'D'}
+    
+    nx.draw_networkx(g, pos, labels=node_label_dict)
+    nx.draw_networkx_edge_labels(g,pos,edge_labels=edge_labels, font_size=14)
+    plt.axis('equal')
+    plt.axis('off')
+
+    
 def total_cost(x, a, b):
     """
     Calculates the total cost for a given demand on the network
@@ -173,58 +234,6 @@ def total_network_cost(g, flows):
     b = [g.edges(data=True)[i][-1]['b'] for i in range(g.number_of_edges())]
     
     return total_cost_func(flows, a, b)
-    
-    
-    
-
-def ta_solve_network(g, demand, regime, fname="solver_out.txt"):
-    """Solves the traffic assignment problem for a network.
-    
-    g - networkx network object
-    demand - a demand range for which to solve the ta problem
-    """
-    
-    adj = np.array(nx.adjacency_matrix(g))
-    edge_list = g.edges()
-    
-    a_coefs = [g[e[0]][e[1]]['a'] for e in g.edges_iter()]
-    b_coefs = [g[e[0]][e[1]]['b'] for e in g.edges_iter()]
-    
-    for i in range(len(g.nodes())):
-        if g.node[i].has_key('origin'):
-            origin_index = i
-        if g.node[i].has_key('destination'):
-            destination_index = i
-    
-    sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index, fname=fname)
-    
-    return sols
-    
-    
-def plot_graph_for_flows(g, OD=None):
-    
-    pos = nx.spring_layout(g)
-    
-    #Make dictionary for edge labels
-    edge_labels = []
-    for i in range(len(g.edges())):
-        u, v = g.edges()[i]
-        edge_labels.append(((u,v,),i+1))
-    edge_labels = dict(edge_labels)
-    
-    if OD is None:
-        origin = g.nodes()[0]
-        destination = g.nodes()[-1]
-    else:
-        origin, destination = OD
-        
-    node_label_dict = {origin:'O', destination:'D'}
-    
-    nx.draw_networkx(g, pos, labels=node_label_dict)
-    nx.draw_networkx_edge_labels(g,pos,edge_labels=edge_labels, font_size=14)
-    plt.axis('equal')
-    plt.axis('off')
-
     
 def plot_flows(D, sols, legend=False):
     """

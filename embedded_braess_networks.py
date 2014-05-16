@@ -7,11 +7,21 @@ braess networks (see stuff in binder), hopefully a pdf
 with the drawing for each will be added soon.
 """
 
+
+a = 0.5
+b = 0.5
+am = 0.1
+bm = 0.1
+
 adj_braess = np.array([0,1,1,0,
                        0,0,1,1,
                        0,0,0,1,
                        0,0,0,0]).reshape(4,4)
 
+a_coefs = [a, 1, am, 1, a]
+b_coefs = [1, b, bm, b, 1]
+                       
+                       
 
 #Adjacent braess networks:
 #down:
@@ -28,12 +38,9 @@ adj_ai = np.array([0,1,1,1,0,
                    0,0,0,1,1,
                    0,0,0,0,1,
                    0,0,0,0,0]).reshape(5,5)
-a = 0.5
-b = 0.5
-am = 0.1
-bm = 0.1
-a_coefs = [a, a, 1, am, 1, am, 1, a]
-b_coefs = [1, 1, b, bm, b, bm, b, 1]
+
+#a_coefs = [a, a, 1, am, 1, am, 1, a]
+#b_coefs = [1, 1, b, bm, b, bm, b, 1]
 
 
 #Embedded braess networks:

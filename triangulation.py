@@ -128,11 +128,30 @@ def prune_triangulation(g, param):
     return g_pruned
 
 
-def make_pruned_triangulation(nodes, param, b_max=1.0):
+def make_pruned_triangulation(nodes, param=0, b_max=1.0):
     g = make_triangulation(nodes, b_max)
     g = prune_triangulation(g, param)
     
     return g
+    
+def reasign_b(g, b_max):
+    """
+    Reasingns the 'b' parameter on the edges of graph 'g'
+    
+    g - network
+    """
+     
+    for e in g.edges():
+        g[e[0]][e[1]]['b'] = np.random.random()*b_max
+     
+    
+    
+    
+    
+    
+    
+    
+    
     
 #########################################################
 #########################################################
