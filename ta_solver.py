@@ -151,20 +151,27 @@ def ta_solve_network(g, demand, regime, fname="solver_out.txt"):
     a_coefs = list(coefs[:,0])
     b_coefs = list(coefs[:,1])
 
-    for i in range(len(g.nodes())):
-        if g.node[i].has_key('origin'):
-            origin_index = i
-            origin_exists = True
-        if g.node[i].has_key('destination'):
-            destination_index = i
-            destination_exists = True
-            
-    # If no origin or destination exists, the first node in the network is taken to be origin and 
-    # the last node is taken to be the destination
-    if not origin_exists:
-        g.node[0]['origin']=True
-    if not destination_exists:
-        g.node[g.number_of_nodes() - 1]['destination']=True
+
+    # Start by assuming no origin and destination have been assigned
+    origin_exists = False
+    destination_exists = False
+
+    while (not origin_exists) and (not destination_exists):
+
+        for i in range(len(g.nodes())):
+            if g.node[i].has_key('origin'):
+                origin_index = i
+                origin_exists = True
+            if g.node[i].has_key('destination'):
+                destination_index = i
+                destination_exists = True
+
+        # If no origin or destination exists, the first node in the network is taken to be origin and
+        # the last node is taken to be the destination
+        if not origin_exists:
+            g.node[0]['origin']=True
+        if not destination_exists:
+            g.node[g.number_of_nodes() - 1]['destination']=True
     
     sols = ta_range_solve(demand, adj, edge_list, a_coefs, b_coefs, regime, origin_index, destination_index, fname=fname)
     
@@ -252,6 +259,16 @@ def plot_flows(D, sols, legend=False):
     #todo: plot the graph here as well (possibly in upper left corner) / maybe if graph is smaller than N nodes
         
     plt.show()
+
+def plot_cost(g, D, sols):
+
+    cost = total_network_cost(g, sols)
+
+    plt.plot(D, cost)
+    show()
+
+    
+    
     
 
 ##Testing values (this should be commented out when using as a library)
