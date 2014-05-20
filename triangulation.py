@@ -1,6 +1,7 @@
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.animation as animation
 import scipy as sp
 import numpy as np
 import networkx as nx
@@ -383,13 +384,15 @@ def plot_active_links_1step(g, sol, colour='magenta'):
     plt.show()
     
 
-def active_linkset_animation():
+def active_linkset_animation(g, sols):
     """
     Returns an animation of the active linkset with demand
     
     For this to work, the solution must also have been calculated and the demand range must be called D
     (will try to fix this...)
     """
+
+    global graph
     
     fig = plt.figure()
 
@@ -401,7 +404,7 @@ def active_linkset_animation():
         plt.title("demand = {}".format(D[i]))
         return graph
 
-    ani = mpl.animation.FuncAnimation(fig, animate, frames=len(D))
+    ani = animation.FuncAnimation(fig, animate, frames=len(D))
     
     return ani
 
