@@ -146,6 +146,23 @@ def reasign_a(g, a_max):
     for e in g.edges():
         g[e[0]][e[1]]['a'] = np.random.random()*b_max
 
+
+def rand_shrink_a(g, percentage_of_links, scale):
+    """
+    This function reasigns the "a" parameter of a percentage of links in the network to make them small
+    it scales them by the scaling factor scale
+    """
+
+    edge_list = g.edges()
+    number_to_change = int(len(edge_list)*percentage_of_links)
+    
+    np.random.shuffle(edge_list)
+    edges_to_change = edge_list[:number_to_change]
+
+    for e in edges_to_change:
+        g[e[0]][e[1]]["a"] = g[e[0]][e[1]]["a"]*scale
+    
+
 def reasign_b(g, b_max):
     """
     Reasingns the 'b' parameter on the edges of graph 'g'
@@ -536,8 +553,46 @@ def MST(g, w='a'):
     
     return g_mst
 
-    
 
+
+def make_asym_braess(alpha, beta, xi, eta, a=0.5, b=0.5, am=0.1, bm=0.1):
+
+    adj = np.array([0,1,1,0,
+                    0,0,1,1,
+                    0,0,0,1,
+                    0,0,0,0]).reshape(4,4)
+
+    a = 0.5
+    b = 0.5
+    am = 0.1
+    bm = 0.1
+
+    a_coefs = [a + alpha/2.0, 1 + xi/2.0 , am, 1 - xi/2.0, a - alpha/2.0]
+    b_coefs = [1 + beta/2.0 , b + eta/2.0, bm, b - eta/2.0, 1 - beta/2.0]
+
+    if all(a_coefs) and all(b_coefs):
+        return make_network(adj, a_coefs, b_coefs)
+    else:
+        print "ERROR: Negative cost coefficient present"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 #plot_net(g, "edges")
 #plot_net(g_mst, 'edges', 'cyan', width=2.5)
 #plot_net(g_pruned, 'edges', 'magenta')

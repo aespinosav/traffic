@@ -208,7 +208,7 @@ def total_cost(x, a, b):
     Calculates the total cost for a given demand on the network
     with linear cost functions.
     
-    x - vector of link flows
+    x - vector of link flows at a given demand
     a - vector of constant terms in cost functions
     b - vector of linear coefficients of cost funtions
     
@@ -216,8 +216,8 @@ def total_cost(x, a, b):
     """
     
     x = np.array(x)
-    a = np.array(x)
-    b = np.array(x)
+    a = np.array(a)
+    b = np.array(b)
     
     cost = np.dot(x,a) + np.dot(x, b*x)
     
@@ -239,6 +239,7 @@ def total_network_cost(g, flows):
     
     a = [g.edges(data=True)[i][-1]['a'] for i in range(g.number_of_edges())]
     b = [g.edges(data=True)[i][-1]['b'] for i in range(g.number_of_edges())]
+    
     
     return total_cost_func(flows, a, b)
     
@@ -270,7 +271,34 @@ def plot_cost(g, D, sols):
     
     
     
+def subgraph_cost(g, flows, links):
+    """
+    Calculates the costs as a function of demand for the flow on the links selected
 
+    g - graph
+    D - Demand range
+    sols - flow solution vector for complete network
+    links - either one link or a list of links to calculate the aggregate cost for
+    """
+
+    links = list(links)
+
+    a = [g.edges(data=True)[i][-1]['a'] for i in range(g.number_of_edges())]
+    b = [g.edges(data=True)[i][-1]['b'] for i in range(g.number_of_edges())]
+
+    flow_list = np.array([flows.T[i-1]. for i in links]).T
+
+    new_a = [a[i-1] for i in links]
+    new_b = [b[i-1] for i in links]
+
+    sub_graph_costs = total_cost_func(flow_list, new_a, new_b)
+
+    return sub_graph_costs
+        
+
+    
+
+    
 ##Testing values (this should be commented out when using as a library)
 #aa = 0.5
 #bb = 0.5
