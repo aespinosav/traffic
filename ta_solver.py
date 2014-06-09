@@ -286,7 +286,7 @@ def subgraph_cost(g, flows, links):
     a = [g.edges(data=True)[i][-1]['a'] for i in range(g.number_of_edges())]
     b = [g.edges(data=True)[i][-1]['b'] for i in range(g.number_of_edges())]
 
-    flow_list = np.array([flows.T[i-1]. for i in links]).T
+    flow_list = np.array([flows.T[i-1] for i in links]).T
 
     new_a = [a[i-1] for i in links]
     new_b = [b[i-1] for i in links]
@@ -294,9 +294,19 @@ def subgraph_cost(g, flows, links):
     sub_graph_costs = total_cost_func(flow_list, new_a, new_b)
 
     return sub_graph_costs
-        
+
+#def subgraph_between_nodes(start_node, finish_node):
+    """
+    Returns a subgraph contained between chosen nodes.
+    i.e. this subgraph is the graph induced by all the possible paths from start_node
+    to finish_node
+    """
 
     
+    
+    
+
+
 
     
 ##Testing values (this should be commented out when using as a library)

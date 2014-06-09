@@ -144,7 +144,7 @@ def reasign_a(g, a_max):
     """
 
     for e in g.edges():
-        g[e[0]][e[1]]['a'] = np.random.random()*b_max
+        g[e[0]][e[1]]['a'] = np.random.random()*a_max
 
 
 def rand_shrink_a(g, percentage_of_links, scale):
@@ -555,6 +555,14 @@ def MST(g, w='a'):
 
 
 
+
+
+
+###################################
+###################################
+
+# other useful functions!
+
 def make_asym_braess(alpha, beta, xi, eta, a=0.5, b=0.5, am=0.1, bm=0.1):
 
     adj = np.array([0,1,1,0,
@@ -576,8 +584,22 @@ def make_asym_braess(alpha, beta, xi, eta, a=0.5, b=0.5, am=0.1, bm=0.1):
         print "ERROR: Negative cost coefficient present"
 
 
-
-
+def make_network(adj, a_coefs, b_coefs):
+    """
+    Makes directed network from adjacency matrix and deletes the 'weight' attr.
+    
+    It also gives the edges their a and b coef as attributes
+    """
+    
+    g = nx.DiGraph(adj)
+    
+    for i in range(len(g.edges())):
+        e = g.edges()[i]
+        del g[e[0]][e[1]]['weight']
+        g[e[0]][e[1]]['a'] = a_coefs[i]
+        g[e[0]][e[1]]['b'] = b_coefs[i]
+        
+    return g
 
 
 
