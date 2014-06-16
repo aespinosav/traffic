@@ -457,7 +457,7 @@ def switch_counter(X):
             
     return [counter, switching_demand]
 
-def link_state(flow, tol=1E-4):
+def link_state(D, flow, tol=1E-4):
     """
     Returns an array of 0s and 1s that represent whether the
     link is active for the corresponding demand levels
@@ -466,6 +466,8 @@ def link_state(flow, tol=1E-4):
     tol - tolerance for when considering a link is active
     """
 
+    flow = flow/D
+    
     link_status_list = []
 
     for f in flow:
@@ -478,7 +480,9 @@ def link_state(flow, tol=1E-4):
 
     return np.array(link_status_list)
 
-def network_state(sols, tol=1E-4):
+
+    
+def network_state(D, sols, tol=1E-4):
     """
     Returns a 2D array of the state of the links (active/inactive) at the demand levels (D and sols must be compatible)
     
@@ -486,10 +490,35 @@ def network_state(sols, tol=1E-4):
     tol - tolerance to determine when a link has no flow
     """
 
-    state_list = [link_state(f, tol) for f in sols]
+    state_list = [link_state(D, f, tol) for f in sols]
 
     return np.array(state_list)
 
+
+def plot_swithces(g, D, sols, tol=1E-3, col_map='RdBu'):
+
+    states = network_state(sols, tol)
+
+    y = np.arange(g.number_of_edges()+1)
+    x = list(D)
+    x.append(D[-1] + (D[-1] - D[-2]))
+    X, Y = np.meshgrid(x, y)
+    
+    colormap = plt.cm.get_cmap(col_map, 2)
+    plt.pcolormesh(X, Y, states.transpose(), cmap=colormap)
+    
+    plt.hlines(np.arange(0,g.number_of_edges()), 0, D[-1])
+    plt.yticks(np.arange(0,g.number_of_edges())+0.5, np.arange(1,g.number_of_edges()+1))
+    cbar = plt.colorbar(ticks=[0.25, 0.75])
+    cbar.set_ticklabels(['Off', 'On'], update_ticks=True)
+
+    plt.xlabel("Demand")
+    plt.ylabel("Links")
+    plt.xlim([D[0], D[-1]])
+    plt.ylim([0,g.number_of_edges()])
+
+    plt.show()
+    
 
 def has_switching_off(D, sols, tol=1E-4):
     """
@@ -498,10 +527,10 @@ def has_switching_off(D, sols, tol=1E-4):
     D - demand range
     sols - solutions for flows in the TA problem
     tol - tolerance to determine whether there is actually a flow
-    """    
+    """
 
     states = network_state(sols, tol)
-    
+
     counter_demand_list = [switch_counter(s) for s in states]
 
     links_with_off = [i for i in range(len(sols)) if counter_demand_list[i][0] > 1]
@@ -514,36 +543,17 @@ def has_switching_off(D, sols, tol=1E-4):
         for i in range(len(links_with_off)):
             print "Link {} switches off at {}".format(links_with_off[i], counter_demand_list[links_with_off[i]][1])
 
-    if len(links_with_multiple) > 0:
-        print "The network has {} links that switch off\n".format(len(links_with_multiple))
-        for i in range(len(links_with_multiple)):
-            print "Link {} has swithes at: \t".format(links_with_off[i]),  counter_demand_list[links_with_off[i]][:]
+            if len(links_with_multiple) > 0:
+                print "The network has {} links that switch off\n".format(len(links_with_multiple))
+                for i in range(len(links_with_multiple)):
+                    print "Link {} has swithes at: \t".format(links_with_off[i]),  counter_demand_list[links_with_off[i]][:]
 
-    return counter_demand_list, links_with_off, links_with_multiple
+                    return counter_demand_list, links_with_off, links_with_multiple
+
+
+
 
     
-def plot_swithces(g, D, sols, tol=1E-3, col_map='RdBu'):
-
-    states = network_state(sols, tol)
-
-    y = np.arange(g.number_of_edges()+1)
-    x = list(D)
-    x.append(D[-1] + (D[-1] - D[-2]))
-    X, Y = np.meshgrid(x, y)
-    colormap = plt.cm.get_cmap(col_map, 2)
-    plt.pcolormesh(X, Y, states.transpose(), cmap=colormap)
-    plt.hlines(np.arange(0,g.number_of_edges()), 0, D[-1])
-    plt.yticks(np.arange(0,g.number_of_edges())+0.5, np.arange(1,g.number_of_edges()+1))
-    cbar = plt.colorbar(ticks=[0.25, 0.75])
-    cbar.set_ticklabels(['Off', 'On'], update_ticks=True)
-
-    plt.xlabel("Demand")
-    plt.ylabel("Links")
-    plt.xlim([D[0], D[-1]])
-
-    plt.show()
-    
-        
 def MST(g, w='a'):
     """
     Returns the minimum spanning tree of the graph given,

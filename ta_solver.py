@@ -243,13 +243,16 @@ def total_network_cost(g, flows):
     
     return total_cost_func(flows, a, b)
     
-def plot_flows(D, sols, legend=False):
+def plot_flows(D, sols, normalised=False, legend=False):
     """
     Plots the flows obtained from ta_range_solve when given the demand range and the flow solutions
     """
-    
-    for i in range(len(sols[0])):
-        plt.plot(D, sols[:,i], label="Flow {}".format(i+1))
+    if not normalised:
+        for i in range(len(sols[0])):
+            plt.plot(D, sols[:,i], label="Flow {}".format(i+1))
+    else:
+        for i in range(len(sols[0])):
+            plt.plot(D, sols[:,i]/D, label="Flow {}".format(i+1))
     
     if legend:
         plt.legend(loc=4)
