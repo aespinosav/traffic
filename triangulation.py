@@ -6,6 +6,12 @@ import scipy as sp
 import numpy as np
 import networkx as nx
 
+
+mpl.rcParams['axes.labelsize'] = 16
+mpl.rcParams['xtick.labelsize'] = 14
+mpl.rcParams['ytick.labelsize'] = 14
+
+
 """
 Functions and/or objects to create a network using delaunay triangulation.
 The objective is to generate a random connected directed planar graph.
@@ -490,14 +496,14 @@ def network_state(D, sols, tol=1E-4):
     tol - tolerance to determine when a link has no flow
     """
 
-    state_list = [link_state(D, f, tol) for f in sols]
+    state_list = [link_state(D, x, tol) for x in sols.T]
 
     return np.array(state_list)
 
 
 def plot_swithces(g, D, sols, tol=1E-3, col_map='RdBu'):
 
-    states = network_state(sols, tol)
+    states = network_state(D, sols, tol)
 
     y = np.arange(g.number_of_edges()+1)
     x = list(D)
@@ -505,15 +511,15 @@ def plot_swithces(g, D, sols, tol=1E-3, col_map='RdBu'):
     X, Y = np.meshgrid(x, y)
     
     colormap = plt.cm.get_cmap(col_map, 2)
-    plt.pcolormesh(X, Y, states.transpose(), cmap=colormap)
+    plt.pcolormesh(X, Y, states, cmap=colormap)
     
     plt.hlines(np.arange(0,g.number_of_edges()), 0, D[-1])
     plt.yticks(np.arange(0,g.number_of_edges())+0.5, np.arange(1,g.number_of_edges()+1))
     cbar = plt.colorbar(ticks=[0.25, 0.75])
     cbar.set_ticklabels(['Off', 'On'], update_ticks=True)
 
-    plt.xlabel("Demand")
-    plt.ylabel("Links")
+    plt.xlabel("Demand", fontsize=16)
+    plt.ylabel("Links", fontsize=16)
     plt.xlim([D[0], D[-1]])
     plt.ylim([0,g.number_of_edges()])
 
