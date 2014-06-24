@@ -448,13 +448,13 @@ def switch_counter(X):
     counts how many times there is a change from a series of zeros to a series of ones
     in an array or list of only zeros or ones
 
-    returns an list that has the number of swithces in a link plus the demand at which the swithces occur.
+    returns a list that has the number of swithces in a link plus the demand at which the swithces occur.
     """
 
     counter = 0
     switching_demand = []
     
-    for i in range(len(X)-1):
+    for i in range(1,len(X)-2):
 
         dif = X[i+1] - X[i]
         if dif != 0:
@@ -526,7 +526,38 @@ def plot_swithces(g, D, sols, tol=1E-3, col_map='RdBu'):
     plt.show()
     
 
-def has_switching_off(D, sols, tol=1E-4):
+#def has_switching_off(D, sols, tol=1E-4):
+    #"""
+    #Determines whether there are any switches in the active link set for the given demand range
+
+    #D - demand range
+    #sols - solutions for flows in the TA problem
+    #tol - tolerance to determine whether there is actually a flow
+    #"""
+
+    #states = network_state(D, sols, tol)
+
+    #counter_demand_list = [switch_counter(s) for s in states]
+
+    #links_with_off = [i for i in range(len(sols.T)) if counter_demand_list[i][0] > 1]
+
+    #links_with_multiple = [i for i in range(len(sols.T)) if counter_demand_list[i][0] > 2]
+
+
+    #if len(links_with_off) > 0:
+        #print "The network has {} links that switch off\n".format(len(links_with_off))
+        #for i in range(len(links_with_off)):
+            #print "Link {} switches off at {}".format(links_with_off[i], counter_demand_list[links_with_off[i]][1])
+
+            #if len(links_with_multiple) > 0:
+                #print "The network has {} links that switch off\n".format(len(links_with_multiple))
+                #for i in range(len(links_with_multiple)):
+                    #print "Link {} has swithes at: \t".format(links_with_off[i]),  counter_demand_list[links_with_off[i]][:]
+
+                    #return counter_demand_list, links_with_off, links_with_multiple
+
+
+def has_switching_off(D, sols, tol=1E-3):
     """
     Determines whether there are any switches in the active link set for the given demand range
 
@@ -535,29 +566,29 @@ def has_switching_off(D, sols, tol=1E-4):
     tol - tolerance to determine whether there is actually a flow
     """
 
-    states = network_state(sols, tol)
+    states = network_state(D, sols, tol)
 
     counter_demand_list = [switch_counter(s) for s in states]
 
-    links_with_off = [i for i in range(len(sols)) if counter_demand_list[i][0] > 1]
+    #links_with_off = [i for i in range(len(sols.T)) if counter_demand_list[i][0] > 1]
 
-    links_with_multiple = [i for i in range(len(sols)) if counter_demand_list[i][0] > 2]
-
-
-    if len(links_with_off) > 0:
-        print "The network has {} links that switch off\n".format(len(links_with_off))
-        for i in range(len(links_with_off)):
-            print "Link {} switches off at {}".format(links_with_off[i], counter_demand_list[links_with_off[i]][1])
-
-            if len(links_with_multiple) > 0:
-                print "The network has {} links that switch off\n".format(len(links_with_multiple))
-                for i in range(len(links_with_multiple)):
-                    print "Link {} has swithes at: \t".format(links_with_off[i]),  counter_demand_list[links_with_off[i]][:]
-
-                    return counter_demand_list, links_with_off, links_with_multiple
+    #links_with_multiple = [i for i in range(len(sols.T)) if counter_demand_list[i][0] > 2]
 
 
+    switch_types = []
+    
+    for i in range(len(counter_demand_list)):
+        if counter_demand_list[i][0]!=0:
+            for j in counter_demand_list[i][1]:
+                switch_types.append(states[i,j+1])
 
+                
+    #print switch_types
+    
+    if 0 in switch_types:
+        return True
+    else:
+        return False
 
     
 def MST(g, w='a'):
